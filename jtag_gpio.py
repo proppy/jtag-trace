@@ -1271,24 +1271,39 @@ class SpiPort:
             phy_sync(0, 0)
             phy_sync(0, 0)
             tdo_vect = ''
-            bytestr = bytes(exchange_data[:-1], 'utf-8')
-            #tdo_temp = '0'*len(exchange_data[:-1]) # initialize space for tdo_vect
-            #retstr = bytes(tdo_temp, 'utf-8')
-            
-            #ffistr = ffi.new("char[]", bytestr)
-            #ffiret = ffi.new("char[]", retstr) 
-            #keepalive.append(ffistr) # need to make sure the lifetime of the string is long enough for the call
-            #keepalive.append(ffiret)
+            if compat:
+                GPIO.output((TCK_pin, TDI_pin), (0, 1))
+                for bit in exchange_data[:-1]:
+                    if bit == '1':
+                        GPIO.output( (TCK_pin, TDI_pin), (1, 1) )
+                        GPIO.output( (TCK_pin, TDI_pin), (0, 1) )
+                    else:
+                        GPIO.output( (TCK_pin, TDI_pin), (1, 0) )
+                        GPIO.output( (TCK_pin, TDI_pin), (0, 0) )
+                    tdo = GPIO.input(TDO_pin)
+                if tdo == 1 :
+                    tdo_vect = '1' + tdo_vect
+                else:
+                    tdo_vect = '0' + tdo_vect
+            else:
+                bytestr = bytes(exchange_data[:-1], 'utf-8')
+                #tdo_temp = '0'*len(exchange_data[:-1]) # initialize space for tdo_vect
+                #retstr = bytes(tdo_temp, 'utf-8')
 
-            # clear the ffi memory before using it
-            ffi.memmove(ffistr, bytes(len(exchange_data) + 1), len(exchange_data) + 1)
-            ffi.memmove(ffiret, bytes(len(exchange_data) + 1), len(exchange_data) + 1)
-            
-            ffi.memmove(ffistr, bytestr, len(bytestr))
-            
-            jtag_prog_rbk(ffistr, gpio_pointer, ffiret)
+                #ffistr = ffi.new("char[]", bytestr)
+                #ffiret = ffi.new("char[]", retstr) 
+                #keepalive.append(ffistr) # need to make sure the lifetime of the string is long enough for the call
+                #keepalive.append(ffiret)
 
-            tdo_vect = ffi.string(ffiret).decode('utf-8')
+                # clear the ffi memory before using it
+                ffi.memmove(ffistr, bytes(len(exchange_data) + 1), len(exchange_data) + 1)
+                ffi.memmove(ffiret, bytes(len(exchange_data) + 1), len(exchange_data) + 1)
+
+                ffi.memmove(ffistr, bytestr, len(bytestr))
+
+                jtag_prog_rbk(ffistr, gpio_pointer, ffiret)
+
+                tdo_vect = ffi.string(ffiret).decode('utf-8')
 
             if exchange_data[-1:] == '1':
                 tdi = 1
