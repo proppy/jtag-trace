@@ -290,17 +290,17 @@ def jtag_step():
                 if compat:
                     GPIO.output((TCK_pin, TDI_pin), (0, 1))
                     for bit in cur_leg[1][:-1]:
-                       if bit == '1':
-                          GPIO.output( (TCK_pin, TDI_pin), (1, 1) )
-                          GPIO.output( (TCK_pin, TDI_pin), (0, 1) )
-                       else:
-                          GPIO.output( (TCK_pin, TDI_pin), (1, 0) )
-                          GPIO.output( (TCK_pin, TDI_pin), (0, 0) )
-                    tdo = GPIO.input(TDO_pin)
-                    if tdo == 1 :
-                        tdo_vect = '1' + tdo_vect
-                    else:
-                        tdo_vect = '0' + tdo_vect
+                        if bit == '1':
+                           GPIO.output( (TCK_pin, TDI_pin), (1, 1) )
+                           GPIO.output( (TCK_pin, TDI_pin), (0, 1) )
+                        else:
+                           GPIO.output( (TCK_pin, TDI_pin), (1, 0) )
+                           GPIO.output( (TCK_pin, TDI_pin), (0, 0) )
+                        tdo = GPIO.input(TDO_pin)
+                        if tdo == 1 :
+                            tdo_vect = '1' + tdo_vect
+                        else:
+                            tdo_vect = '0' + tdo_vect
                 else:
                     bytestr = bytes(cur_leg[1][:-1], 'utf-8')
                     tdo_temp = '0'*len(cur_leg[1][:-1]) # initialize space for tdo_vect
@@ -1281,10 +1281,10 @@ class SpiPort:
                         GPIO.output( (TCK_pin, TDI_pin), (1, 0) )
                         GPIO.output( (TCK_pin, TDI_pin), (0, 0) )
                     tdo = GPIO.input(TDO_pin)
-                if tdo == 1 :
-                    tdo_vect = '1' + tdo_vect
-                else:
-                    tdo_vect = '0' + tdo_vect
+                    if tdo == 1 :
+                        tdo_vect = '1' + tdo_vect
+                    else:
+                        tdo_vect = '0' + tdo_vect
             else:
                 bytestr = bytes(exchange_data[:-1], 'utf-8')
                 #tdo_temp = '0'*len(exchange_data[:-1]) # initialize space for tdo_vect
